@@ -24,10 +24,12 @@ const DEFAULT_SHORTCUTS: ShortcutMap = {
   openGlobalTraitsEditor: "ctrl+x",
 };
 
-const DEFAULT_LANGUAGE: LanguagePreference =
-  typeof window !== "undefined" && window.navigator.language.startsWith("zh")
-    ? "zh"
-    : "en";
+const DEFAULT_LANGUAGE: LanguagePreference = "en";
+
+const DISABLE_QWEN_HINT_DEFAULT =
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_DISABLE_QWEN_HINT === "true";
+export const SHOULD_SHOW_QWEN_HINT_DEFAULT = !DISABLE_QWEN_HINT_DEFAULT;
 
 export interface SettingsState {
   imageBinarizing: boolean;
@@ -36,11 +38,16 @@ export interface SettingsState {
   showDonateBtn: boolean;
   setShowDonateBtn: (showDonateBtn: boolean) => void;
 
+  showQwenHint: boolean;
+  setShowQwenHint: (show: boolean) => void;
+
   theme: ThemePreference;
   setThemePreference: (theme: ThemePreference) => void;
 
   language: LanguagePreference;
+  languageInitialized: boolean;
   setLanguage: (language: LanguagePreference) => void;
+  initializeLanguage: () => void;
 
   keybindings: ShortcutMap;
   setKeybinding: (action: ShortcutAction, binding: string) => void;
@@ -55,15 +62,35 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       imageBinarizing: false,
       showDonateBtn: true,
+      showQwenHint: SHOULD_SHOW_QWEN_HINT_DEFAULT,
       theme: "system",
       language: DEFAULT_LANGUAGE,
+      languageInitialized: false,
       keybindings: { ...DEFAULT_SHORTCUTS },
       traits: "",
 
       setImageBinarizing: (state) => set({ imageBinarizing: state }),
       setShowDonateBtn: (state) => set({ showDonateBtn: state }),
+      setShowQwenHint: (state) => set({ showQwenHint: state }),
       setThemePreference: (theme) => set({ theme }),
-      setLanguage: (language) => set({ language }),
+      setLanguage: (language) =>
+        set({
+          language,
+          languageInitialized: true,
+        }),
+      initializeLanguage: () =>
+        set((state) => {
+          if (state.languageInitialized) {
+            return state;
+          }
+          const prefersZh =
+            typeof navigator !== "undefined" &&
+            navigator.language.toLowerCase().startsWith("zh");
+          return {
+            languageInitialized: true,
+            language: prefersZh ? "zh" : "en",
+          };
+        }),
       setKeybinding: (action, binding) =>
         set((state) => ({
           keybindings: {
@@ -80,12 +107,14 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         imageBinarizing: state.imageBinarizing,
         showDonateBtn: state.showDonateBtn,
+        showQwenHint: state.showQwenHint,
         theme: state.theme,
         language: state.language,
+        languageInitialized: state.languageInitialized,
         keybindings: state.keybindings,
         traits: state.traits,
       }),
-      version: 3,
+      version: 5,
       migrate: (persistedState, version) => {
         const data =
           persistedState && typeof persistedState === "object"
@@ -93,10 +122,7 @@ export const useSettingsStore = create<SettingsState>()(
             : {};
 
         if (version < 3) {
-          return {
-            ...data,
-            keybindings: { ...DEFAULT_SHORTCUTS },
-          };
+          data.keybindings = { ...DEFAULT_SHORTCUTS };
         }
 
         const existing = (data as { keybindings?: ShortcutMap }).keybindings;
@@ -106,6 +132,12 @@ export const useSettingsStore = create<SettingsState>()(
           keybindings: existing
             ? { ...DEFAULT_SHORTCUTS, ...existing }
             : { ...DEFAULT_SHORTCUTS },
+          showQwenHint:
+            (data as { showQwenHint?: boolean }).showQwenHint ??
+            SHOULD_SHOW_QWEN_HINT_DEFAULT,
+          languageInitialized:
+            (data as { languageInitialized?: boolean }).languageInitialized ??
+            true,
         };
       },
     },
@@ -113,3 +145,4 @@ export const useSettingsStore = create<SettingsState>()(
 );
 
 export const getDefaultShortcuts = () => ({ ...DEFAULT_SHORTCUTS });
+

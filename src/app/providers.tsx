@@ -14,6 +14,13 @@ export default function Providers({
   children: React.ReactNode;
 }) {
   const language = useSettingsStore((state) => state.language);
+  const initializeLanguage = useSettingsStore(
+    (state) => state.initializeLanguage,
+  );
+
+  useEffect(() => {
+    initializeLanguage();
+  }, [initializeLanguage]);
 
   useEffect(() => {
     if (language && i18n.language !== language) {
