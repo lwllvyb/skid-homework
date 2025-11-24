@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAiStore } from "@/store/ai-store";
+import { AiProvider, useAiStore } from "@/store/ai-store";
 
 // Type Definition
 type ImportAIModelModel = {
   name: string;
   model: string;
-  provider: "gemini" | "openai";
+  provider: AiProvider;
   baseUrl?: string;
   key: string;
 };
@@ -77,7 +77,7 @@ export default function ImportSettingsPage() {
       apiKey: modelJson.key,
       name: modelJson.name,
       model: modelJson.model,
-      provider: modelJson.provider,
+      provider: modelJson.provider.toLowerCase() as AiProvider,
       baseUrl: modelJson.baseUrl,
       enabled: true,
     });
