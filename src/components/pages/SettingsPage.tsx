@@ -12,6 +12,7 @@ import {
   type LanguagePreference,
   type ThemePreference,
   type ShortcutAction,
+  SHOULD_SHOW_QWEN_HINT_DEFAULT,
 } from "@/store/settings-store";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -28,6 +29,7 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 import { Textarea } from "../ui/textarea";
 import { Kbd } from "../ui/kbd";
 import { Checkbox } from "../ui/checkbox";
@@ -46,6 +48,9 @@ import { toast } from "sonner";
 import { useTheme } from "../theme-provider";
 import ShortcutRecorder from "../ShortcutRecorder";
 import AddAISourceDialog from "../dialogs/settings/AddAISourceDialog";
+import { InfoTooltip } from "../InfoTooltip";
+import { QWEN_TOKEN_URL } from "@/lib/qwen";
+import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
 
 const DEFAULT_BASE_BY_PROVIDER: Record<AiProvider, string> = {
   gemini: DEFAULT_GEMINI_BASE_URL,
@@ -53,7 +58,10 @@ const DEFAULT_BASE_BY_PROVIDER: Record<AiProvider, string> = {
 };
 
 export default function SettingsPage() {
-  const { t, i18n } = useTranslation("commons", { keyPrefix: "settings-page" });
+  const { t, i18n } = useTranslation("commons", {
+    keyPrefix: "settings-page",
+  });
+  const { t: tCommon } = useTranslation("commons");
 
   const sources = useAiStore((s) => s.sources);
   const activeSourceId = useAiStore((s) => s.activeSourceId);
@@ -68,6 +76,8 @@ export default function SettingsPage() {
     setImageBinarizing,
     showDonateBtn,
     setShowDonateBtn,
+    showQwenHint,
+    setShowQwenHint,
     theme: themePreference,
     setThemePreference,
     language,
@@ -82,6 +92,7 @@ export default function SettingsPage() {
     () => sources.find((source) => source.id === activeSourceId) ?? sources[0],
     [sources, activeSourceId],
   );
+  useQwenHintAutoToggle(sources, showQwenHint, setShowQwenHint);
 
   const [localName, setLocalName] = useState(activeSource?.name ?? "");
   const [localApiKey, setLocalApiKey] = useState(activeSource?.apiKey ?? "");
@@ -352,6 +363,21 @@ export default function SettingsPage() {
     }
   };
 
+  const qwenTooltipContent = (
+    <span>
+      {tCommon("qwen-callout.tooltip.prefix")}{" "}
+      <a
+        href={QWEN_TOKEN_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="underline underline-offset-2"
+      >
+        {tCommon("qwen-callout.tooltip.link")}
+      </a>
+      {tCommon("qwen-callout.tooltip.suffix")}
+    </span>
+  );
+
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-4 md:p-8">
       <h1 className="text-2xl font-bold tracking-tight">{t("heading")}</h1>
@@ -436,6 +462,33 @@ export default function SettingsPage() {
                 </div>
               );
             })}
+            {showQwenHint && (
+              <div className="flex flex-col gap-3 rounded-md border border-dashed border-primary/40 bg-primary/5 p-4 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold">
+                      {tCommon("qwen-callout.title")}
+                    </p>
+                    <InfoTooltip
+                      content={qwenTooltipContent}
+                      ariaLabel={tCommon("qwen-callout.title")}
+                    />
+                  </div>
+                  <Badge variant="secondary" className="w-fit">
+                    {tCommon("qwen-callout.badge")}
+                  </Badge>
+                </div>
+                <Button asChild className="w-full md:w-auto">
+                  <a
+                    href={QWEN_TOKEN_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {tCommon("qwen-callout.button")}
+                  </a>
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -755,6 +808,17 @@ export default function SettingsPage() {
             />
             <Label htmlFor="show-donate-btn">
               {t("advanced.ui.show-donate-btn")}
+            </Label>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Checkbox
+              id="show-qwen-hint"
+              checked={showQwenHint}
+              onCheckedChange={(state) => setShowQwenHint(Boolean(state))}
+            />
+            <Label htmlFor="show-qwen-hint">
+              {t("advanced.ui.show-qwen-hint")}
             </Label>
           </div>
         </CardContent>

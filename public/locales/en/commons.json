@@ -203,6 +203,16 @@
   "uploads-info": {
     "selected": "Selected"
   },
+  "qwen-callout": {
+    "title": "Official Qwen Max Service",
+    "badge": "Free",
+    "button": "Get token",
+    "tooltip": {
+      "prefix": "How to import into SkidHomework? Visit",
+      "link": "Console -> Token Management",
+      "suffix": "-> Chat quick import for SkidHomework."
+    }
+  },
   "settings-page": {
     "heading": "SkidHomework Settings",
     "back": "Back",
@@ -372,7 +382,8 @@
       },
       "ui": {
         "title": "UI",
-        "show-donate-btn": "Show donate button"
+        "show-donate-btn": "Show donate button",
+        "show-qwen-hint": "Show Qwen Max service tip"
       }
     }
   },
@@ -416,6 +427,43 @@
     "footer": {
       "notice": "Licensed under GPLv3, created by cubewhy.",
       "source": "Source Code"
+    }
+  },
+  "import-settings-page": {
+    "error": {
+      "title": "Error",
+      "parse-failed": "Failed to parse configuration. The link might be broken.",
+      "home": "Return Home"
+    },
+    "loading": {
+      "parsing": "Parsing configuration..."
+    },
+    "success": {
+      "title": "You're all set!",
+      "description": "The AI model <strong>{{name}}</strong> has been successfully imported.",
+      "buttons": {
+        "settings": "Settings",
+        "undo": "Undo",
+        "home": "Let's Skid"
+      }
+    },
+    "confirm": {
+      "title": "Import AI Model",
+      "description": "Do you want to add this configuration to your settings?",
+      "fields": {
+        "name": "Name:",
+        "provider": "Provider:",
+        "model": "Model Name:",
+        "base": "Base URL:"
+      },
+      "alert": {
+        "title": "Security Check",
+        "description": "Only import configurations from sources you trust. Otherwise it may cause a privacy leak. Use at your own risk."
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Yes, Import"
+      }
     }
   },
   "solution-viewer": {

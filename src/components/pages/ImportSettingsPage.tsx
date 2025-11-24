@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, AlertCircle } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
 
 // UI Components (Adjust import paths based on your project structure)
 import {
@@ -28,10 +29,13 @@ type ImportAIModelModel = {
 
 export default function ImportSettingsPage() {
   const router = useRouter();
+  const { t } = useTranslation("commons", {
+    keyPrefix: "import-settings-page",
+  });
 
   // State
   const [modelJson, setModelJson] = useState<ImportAIModelModel | null>(null);
-  const [error, setError] = useState<string>("");
+  const [errorKey, setErrorKey] = useState<string>("");
   const [isImported, setIsImported] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -63,7 +67,7 @@ export default function ImportSettingsPage() {
       setModelJson(parsedData);
     } catch (err) {
       console.error(err);
-      setError("Failed to parse configuration. The link might be broken.");
+      setErrorKey("error.parse-failed");
     } finally {
       setIsLoading(false);
     }
@@ -105,21 +109,21 @@ export default function ImportSettingsPage() {
   // ------------------------------------------------------------------
 
   // View 1: Error State
-  if (error) {
+  if (errorKey) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4 bg-muted/40">
         <Card className="w-full max-w-md border-destructive/50">
           <CardHeader>
             <CardTitle className="text-destructive flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" /> Error
+              <AlertCircle className="h-5 w-5" /> {t("error.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{error}</p>
+            <p>{t(errorKey)}</p>
           </CardContent>
           <CardFooter>
             <Button variant="outline" onClick={() => router.push("/")}>
-              Return Home
+              {t("error.home")}
             </Button>
           </CardFooter>
         </Card>
@@ -132,7 +136,7 @@ export default function ImportSettingsPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-muted-foreground animate-pulse">
-          Parsing configuration...
+          {t("loading.parsing")}
         </p>
       </div>
     );
@@ -148,11 +152,15 @@ export default function ImportSettingsPage() {
               <CheckCircle2 className="h-8 w-8" />
             </div>
             <h2 className="text-2xl font-semibold tracking-tight">
-              You&apos;re all set!
+              {t("success.title")}
             </h2>
             <p className="text-muted-foreground">
-              The AI model <strong>{modelJson?.name}</strong> has been
-              successfully imported.
+              <Trans
+                t={t}
+                i18nKey="success.description"
+                values={{ name: modelJson?.name ?? "" }}
+                components={{ strong: <strong /> }}
+              />
             </p>
           </CardContent>
           <CardFooter>
@@ -163,18 +171,18 @@ export default function ImportSettingsPage() {
                   variant="secondary"
                   className="flex-1"
                 >
-                  Settings
+                  {t("success.buttons.settings")}
                 </Button>
                 <Button
                   onClick={handleUndo}
                   variant="destructive"
                   className="flex-1"
                 >
-                  Undo
+                  {t("success.buttons.undo")}
                 </Button>
               </div>
               <Button onClick={() => router.push("/")} className="flex-1">
-                Let&apos;s Skid
+                {t("success.buttons.home")}
               </Button>
             </div>
           </CardFooter>
@@ -188,10 +196,8 @@ export default function ImportSettingsPage() {
     <div className="flex min-h-screen items-center justify-center p-4 bg-muted/40">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Import AI Model</CardTitle>
-          <CardDescription>
-            Do you want to add this configuration to your settings?
-          </CardDescription>
+          <CardTitle>{t("confirm.title")}</CardTitle>
+          <CardDescription>{t("confirm.description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -199,13 +205,13 @@ export default function ImportSettingsPage() {
             <div className="grid gap-4 rounded-md border p-4 bg-card/50">
               <div className="grid grid-cols-[100px_1fr] items-center gap-1">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Name:
+                  {t("confirm.fields.name")}
                 </span>
                 <span className="font-medium">{modelJson.name}</span>
               </div>
               <div className="grid grid-cols-[100px_1fr] items-center gap-1">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Provider:
+                  {t("confirm.fields.provider")}
                 </span>
                 <span className="font-medium capitalize">
                   {modelJson.provider}
@@ -213,7 +219,7 @@ export default function ImportSettingsPage() {
               </div>
               <div className="grid grid-cols-[100px_1fr] items-center gap-1">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Model Name:
+                  {t("confirm.fields.model")}
                 </span>
                 <span className="text-sm truncate" title={modelJson.model}>
                   {modelJson.model}
@@ -221,7 +227,7 @@ export default function ImportSettingsPage() {
               </div>
               <div className="grid grid-cols-[100px_1fr] items-center gap-1">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Base URL:
+                  {t("confirm.fields.base")}
                 </span>
                 <span className="text-sm truncate" title={modelJson.baseUrl}>
                   {modelJson.baseUrl}
@@ -232,19 +238,18 @@ export default function ImportSettingsPage() {
 
           <Alert className="mt-4" variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Security Check</AlertTitle>
-            <AlertDescription>
-              Only import configurations from sources you trust. Otherwise it
-              will case a pravicy leak. Use your own risk.
-            </AlertDescription>
+            <AlertTitle>{t("confirm.alert.title")}</AlertTitle>
+            <AlertDescription>{t("confirm.alert.description")}</AlertDescription>
           </Alert>
         </CardContent>
 
         <CardFooter className="flex justify-between gap-2">
           <Button variant="outline" onClick={handleCancel}>
-            Cancel
+            {t("confirm.buttons.cancel")}
           </Button>
-          <Button onClick={handleConfirmImport}>Yes, Import</Button>
+          <Button onClick={handleConfirmImport}>
+            {t("confirm.buttons.confirm")}
+          </Button>
         </CardFooter>
       </Card>
     </div>

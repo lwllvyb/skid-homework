@@ -203,6 +203,16 @@
   "uploads-info": {
     "selected": "已选择"
   },
+  "qwen-callout": {
+    "title": "官方 Qwen Max 服务",
+    "badge": "免费",
+    "button": "点击获取",
+    "tooltip": {
+      "prefix": "如何导入到 SkidHomework？你可以前往",
+      "link": "控制台 -> 令牌管理",
+      "suffix": "-> 聊天 快捷导入 SkidHomework。"
+    }
+  },
   "settings-page": {
     "heading": "SkidHomework 设置",
     "back": "返回",
@@ -372,7 +382,8 @@
       },
       "ui": {
         "title": "界面",
-        "show-donate-btn": "显示捐赠按钮"
+        "show-donate-btn": "显示捐赠按钮",
+        "show-qwen-hint": "显示 Qwen Max 服务提示"
       }
     }
   },
@@ -416,6 +427,43 @@
     "footer": {
       "notice": "基于 GPLv3 许可，由 cubewhy 创建。",
       "source": "源代码"
+    }
+  },
+  "import-settings-page": {
+    "error": {
+      "title": "错误",
+      "parse-failed": "无法解析配置，链接可能已损坏。",
+      "home": "返回首页"
+    },
+    "loading": {
+      "parsing": "正在解析配置..."
+    },
+    "success": {
+      "title": "全部就绪！",
+      "description": "AI 模型 <strong>{{name}}</strong> 已成功导入。",
+      "buttons": {
+        "settings": "设置",
+        "undo": "撤销",
+        "home": "返回首页"
+      }
+    },
+    "confirm": {
+      "title": "导入 AI 模型",
+      "description": "要将此配置添加到你的设置中吗？",
+      "fields": {
+        "name": "名称：",
+        "provider": "提供商：",
+        "model": "模型名称：",
+        "base": "基础 URL："
+      },
+      "alert": {
+        "title": "安全提醒",
+        "description": "仅从可信来源导入配置，否则可能导致隐私泄露，请自行承担风险。"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "confirm": "确认导入"
+      }
     }
   },
   "solution-viewer": {
