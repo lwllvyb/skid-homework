@@ -69,7 +69,7 @@ export default function ImportSettingsPage() {
     if (!modelJson) return;
 
     const newSourceId = addSource({
-      apiKey: modelJson.key,
+      apiKey: modelJson.key ?? null,
       name: modelJson.name,
       model: modelJson.model,
       provider: modelJson.provider.toLowerCase() as AiProvider,
