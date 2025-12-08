@@ -68,6 +68,7 @@ import {
 } from "../ui/dropdown-menu";
 import { MemoizedMarkdown } from "../MarkdownRenderer";
 import Link from "next/link";
+import { Kbd } from "../ui/kbd";
 
 // --- Utilities ---
 function trimTitle(text: string, fallback: string) {
@@ -537,8 +538,8 @@ export default function ChatPage() {
           size="sm"
           onClick={() => router.push("/")}
         >
-          <PanelLeftClose className="h-4 w-4 rotate-180" />
           {t("actions.back")}
+          <Kbd>ESC</Kbd>
         </Button>
       </div>
     </div>
