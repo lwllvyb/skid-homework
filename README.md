@@ -187,6 +187,22 @@ Devtools 功能如下
 
 欢迎PR
 
+### 快速部署(使用Docker)
+
+```shell
+# Replace <commit_hash> with the actual commit hash
+docker run -p 3000:3000 ghcr.io/cubewhy/skid-homework:sha-<commit_hash>
+```
+
+```yaml
+services:
+  skidhw:
+    # Replace <commit_hash> with the actual commit hash
+    image: ghcr.io/cubewhy/skid-homework:sha-<commit_hash>
+    ports:
+      - 3000:3000
+```
+
 ### 构建 Docker 映像
 
 容器开放 `3000` 端口.
