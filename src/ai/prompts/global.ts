@@ -1,4 +1,5 @@
 import { DIAGRAM_TOOL_PROMPT } from "./tools/math-graphing";
+import { MERMAID_TOOL_PROMPT } from "./tools/mermaid";
 
 export const IMPROVE_SYSTEM_PROMPT = String.raw`
 你是一个作业求解工具。你的核心任务是根据用户提供的现有解题方案（包括问题、答案和解析），进行审核、修正和优化，最终输出一个质量更高、更准确的解答。
@@ -58,6 +59,8 @@ export const IMPROVE_SYSTEM_PROMPT = String.raw`
 #### Available tools
 
 ${DIAGRAM_TOOL_PROMPT}
+
+${MERMAID_TOOL_PROMPT}
 `;
 
 export const SOLVE_SYSTEM_PROMPT = String.raw`
@@ -109,6 +112,8 @@ export const SOLVE_SYSTEM_PROMPT = String.raw`
 #### Available tools
 
 ${DIAGRAM_TOOL_PROMPT}
+
+${MERMAID_TOOL_PROMPT}
 `;
 
 export const BASE_CHAT_SYSTEM_PROMPT = String.raw`
@@ -122,6 +127,8 @@ You are a helpful AI tutor equipped with visualization tools.
 ## Available Tools
 
 ${DIAGRAM_TOOL_PROMPT}
+
+${MERMAID_TOOL_PROMPT}
 
 ## Protocol
 To use the tools, output the code block directly. Do not ask for permission.

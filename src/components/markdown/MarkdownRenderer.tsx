@@ -13,6 +13,7 @@ import ForceDiagram from "./diagram/ForceDiagram";
 import MathGraph from "./diagram/MathGraph";
 import { TextShimmer } from "../ui/text-shimmer";
 import { useTranslation } from "react-i18next";
+import MermaidDiagram from "./diagram/MermaidDiagram";
 
 type UnistPoint = {
   line: number;
@@ -84,6 +85,10 @@ const CodeBlock = ({
 
     if (lang === "plot-force") {
       return <ForceDiagram code={content} />;
+    }
+
+    if (lang === "plot-mermaid") {
+      return <MermaidDiagram code={content} />;
     }
   }
 
