@@ -29,15 +29,15 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
     destroyBoard();
 
     // 2. Logic to update error state safely
-    // We use a helper to ensure we don't trigger cascading renders
     const reportError = (message: string | null): void => {
-      // Deferring the state update solves the "cascading renders" warning
       setTimeout(() => {
         setError(message);
       }, 0);
     };
 
     reportError(null);
+
+    let handleKeyDown: (e: KeyboardEvent) => void;
 
     if (boardRef.current) {
       try {
@@ -46,14 +46,63 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
           axis: true,
           showCopyright: false,
           keepaspectratio: false,
+          pan: {
+            enabled: true,
+            needShift: false,
+          },
+          zoom: {
+            factorX: 1.25,
+            factorY: 1.25,
+            wheel: true,
+          },
         });
 
         boardInstance.current = board;
 
+        handleKeyDown = (e: KeyboardEvent) => {
+          const currentBoard = boardInstance.current;
+          if (!currentBoard) return;
+
+          const bbox = currentBoard.getBoundingBox();
+          const dx = (bbox[2] - bbox[0]) * 0.05;
+          const dy = (bbox[1] - bbox[3]) * 0.05;
+
+          let newBbox: [number, number, number, number] | null = null;
+
+          switch (e.key) {
+            case "ArrowUp":
+            case "k":
+              newBbox = [bbox[0], bbox[1] + dy, bbox[2], bbox[3] + dy];
+              break;
+            case "ArrowDown":
+            case "j":
+              newBbox = [bbox[0], bbox[1] - dy, bbox[2], bbox[3] - dy];
+              break;
+            case "ArrowLeft":
+            case "h":
+              newBbox = [bbox[0] - dx, bbox[1], bbox[2] - dx, bbox[3]];
+              break;
+            case "ArrowRight":
+            case "l":
+              newBbox = [bbox[0] + dx, bbox[1], bbox[2] + dx, bbox[3]];
+              break;
+            default:
+              return;
+          }
+
+          e.preventDefault();
+          if (newBbox) {
+            currentBoard.setBoundingBox(newBbox, false);
+          }
+        };
+
+        const currentBoardRef = boardRef.current;
+        currentBoardRef.setAttribute("tabindex", "0");
+        currentBoardRef.addEventListener("keydown", handleKeyDown);
+
         try {
           board.jc.parse(jesseScript);
         } catch (e: unknown) {
-          // Type-safe error handling
           const msg = e instanceof Error ? e.message : String(e);
           reportError(`JesseCode Error: ${msg}`);
         }
@@ -64,7 +113,13 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
       }
     }
 
-    return () => destroyBoard();
+    return () => {
+      if (boardRef.current && handleKeyDown) {
+        boardRef.current.removeEventListener("keydown", handleKeyDown);
+        boardRef.current = null;
+      }
+      destroyBoard();
+    };
   }, [jesseScript, boardId]);
 
   return (
@@ -81,7 +136,7 @@ export default function JSXGraphDiagram({ jesseScript }: JSXGraphDiagramProps) {
         <div
           id={boardId}
           ref={boardRef}
-          className="w-full aspect-3/2 rounded-lg bg-white overflow-hidden"
+          className="w-full aspect-3/2 rounded-lg bg-white overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         />
       )}
     </div>
