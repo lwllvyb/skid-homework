@@ -19,6 +19,7 @@ import MermaidDiagram from "./diagram/MermaidDiagram";
 import DiagramRenderer from "./diagram/DiagramRenderer";
 import CodeRenderer from "./CodeRenderer";
 import { cn } from "@/lib/utils";
+import JSXGraphDiagram from "./diagram/JSXGraphDiagram";
 
 type UnistPoint = {
   line: number;
@@ -72,9 +73,10 @@ const CodeBlock = ({
   const isPlot = lang.startsWith("plot-");
   const isSvg =
     (lang === "svg" || lang === "xml") && content.startsWith("<svg");
+  const isJessecode = lang === "jessecode";
 
   // Handle incomplete blocks early to reduce nesting
-  if ((isPlot || isSvg) && !isBlockComplete) {
+  if ((isPlot || isSvg || isJessecode) && !isBlockComplete) {
     return (
       <TextShimmer className="font-mono text-sm" duration={1}>
         {t("generating-diagram")}
@@ -120,6 +122,12 @@ const CodeBlock = ({
     return (
       <DiagramRenderer language="xml" content={content}>
         <div dangerouslySetInnerHTML={{ __html: cleanSvg }} />
+      </DiagramRenderer>
+    );
+  } else if (isJessecode) {
+    return (
+      <DiagramRenderer language="js" content={content}>
+        <JSXGraphDiagram jesseScript={content} />
       </DiagramRenderer>
     );
   }
