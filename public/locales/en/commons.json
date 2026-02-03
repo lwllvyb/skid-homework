@@ -83,6 +83,10 @@
         "title": "No AI sources configured",
         "description": "Enable at least one AI provider with an API key in Settings before scanning."
       },
+      "unsupported-file": {
+        "title": "Unsupported file type",
+        "description": "Your file with mime type {{mimeType}} is currently not supported by SkidHomework."
+      },
       "pdf-blocked": {
         "title": "PDF uploads disabled",
         "description": "Enable a Gemini source to process PDF files."

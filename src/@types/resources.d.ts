@@ -264,8 +264,12 @@ interface Resources {
           "title": "PDF uploads disabled"
         },
         "post-processing": {
-          "description": "Your image was still post-processing. Please wait.",
+          "description": "Your image was still post-processing. Please wait for a while.",
           "title": "Still processing..."
+        },
+        "unsupported-file": {
+          "description": "Your file with mime type {{mimeType}} is currently not supported by SkidHomework.",
+          "title": "Unsupported file type"
         },
         "working": {
           "description": "Sending {{count}} file(s) to your AI sources...",

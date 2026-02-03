@@ -133,6 +133,11 @@ export default function ScanPage() {
           return false;
         }
 
+        toast(t("toasts.unsupported-file.title"), {
+          description: t("toasts.unsupported-file.description", {
+            mimeType: f.type,
+          }),
+        });
         return false;
       });
 
