@@ -11,7 +11,7 @@ export default function FileContent({ it }: FileContentProps) {
 
   if (it.mimeType.startsWith("image/")) {
     return (
-      <PhotoView src={it.url}>
+      <PhotoView src={it.url} key={it.url}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={it.url}
