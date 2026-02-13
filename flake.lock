@@ -5,11 +5,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1770948535,
-        "narHash": "sha256-WAdGgjnyPyUTifJ1Q7WzaUdOxUXfzRP1GcddPYMPS5M=",
+        "lastModified": 1770958277,
+        "narHash": "sha256-pjebDrPIrV0gqUmuAzumeAnNNrUqdMGZY8pv/ovT400=",
         "owner": "cubewhy",
         "repo": "blackbox-flakes",
-        "rev": "b8bf4bc8b3a5b11266a03b7a3cf4c0cc04e751d5",
+        "rev": "b1f52a50125997a5e99cd851772fe870a48b190d",
         "type": "github"
       },
       "original": {
