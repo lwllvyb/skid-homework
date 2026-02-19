@@ -28,12 +28,33 @@ import {
     isAdbDeviceConnected,
     reconnectAdbDevice,
 } from "@/lib/webadb/screenshot";
-import {UnsupportedEnvironmentError} from "@/lib/webadb/manager.ts";
+import {UnsupportedEnvironmentError} from "@/lib/webadb/manager";
 
 export type UploadAreaProps = {
     appendFiles: (files: File[] | FileList, source: FileItem["source"]) => void;
     allowPdf: boolean;
 };
+
+export class TimeoutError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "TimeoutError";
+    }
+}
+
+export function withTimeout<T>(
+    promise: Promise<T>,
+    ms: number,
+    timeoutErrorMsg = 'Operation timed out'
+): Promise<T> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+            reject(new TimeoutError(timeoutErrorMsg));
+        }, ms);
+    });
+
+    return Promise.race([promise, timeoutPromise]);
+}
 
 export default function UploadArea({appendFiles, allowPdf}: UploadAreaProps) {
     const {t} = useTranslation("commons", {keyPrefix: "upload-area"});
@@ -42,13 +63,13 @@ export default function UploadArea({appendFiles, allowPdf}: UploadAreaProps) {
         returnObjects: true,
     }) as string[];
 
-  const isWorking = useProblemsStore((s) => s.isWorking);
-  const [cameraTipOpen, setCameraTipOpen] = useState(false);
-  const [adbBusy, setAdbBusy] = useState(false);
-  const [adbBusyMode, setAdbBusyMode] = useState<"connect" | "capture" | null>(
-    null,
-  );
-  const [adbConnected, setAdbConnected] = useState(false);
+    const isWorking = useProblemsStore((s) => s.isWorking);
+    const [cameraTipOpen, setCameraTipOpen] = useState(false);
+    const [adbBusy, setAdbBusy] = useState(false);
+    const [adbBusyMode, setAdbBusyMode] = useState<"connect" | "capture" | null>(
+        null,
+    );
+    const [adbConnected, setAdbConnected] = useState(false);
 
     const uploadInputRef = useRef<HTMLInputElement | null>(null);
     const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -130,13 +151,17 @@ export default function UploadArea({appendFiles, allowPdf}: UploadAreaProps) {
             const ok = await reconnectAdbDevice();
             setAdbConnected(ok);
         } catch (error) {
-            console.error("ADB reconnect failed", error);
-            setAdbConnected(false);
+            if (error instanceof UnsupportedEnvironmentError) {
+                toast.error(t("toasts.webusb-not-supported"));
+            } else {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                toast.error(t("toasts.adb-failed", {error: errorMessage}));
+            }
         } finally {
             setAdbBusy(false);
             setAdbBusyMode(null);
         }
-    }, [adbBusy, isWorking]);
+    }, [adbBusy, isWorking, t]);
 
     const handleAdbBtnClicked = useCallback(async () => {
         if (isWorking || adbBusy) return;
@@ -148,14 +173,15 @@ export default function UploadArea({appendFiles, allowPdf}: UploadAreaProps) {
                 setAdbConnected(ok);
             } else {
                 setAdbBusyMode("capture");
-                const file = await captureAdbScreenshot();
+                const file = await withTimeout(captureAdbScreenshot(), 5_000);
                 appendFiles([file], "adb");
             }
         } catch (err) {
-            if (err instanceof UnsupportedEnvironmentError){
+            if (err instanceof UnsupportedEnvironmentError) {
                 toast.error(t("toasts.webusb-not-supported"))
-            }
-            else{
+            } else if (err instanceof TimeoutError) {
+                toast.error(t("adb.capture-timeout"))
+            } else {
                 const errorMessage = err instanceof Error ? err.message : String(err);
                 toast.error(t("toasts.adb-failed", {error: errorMessage}))
                 // On failure we keep current adb-connected state as-is

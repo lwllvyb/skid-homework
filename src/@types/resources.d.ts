@@ -192,7 +192,20 @@ interface Resources {
       },
       "image-alt": "作业预览图",
       "no-files": "没有文件 上传或拍照以开始",
-      "remove-aria": "移除图片",
+      "remove": {
+        "aria": "移除图片",
+        "menu-item": "移除图片"
+      },
+      "rename": {
+        "dialog": {
+          "confirm": "确认",
+          "desc": "请输入文件的新名称",
+          "new-name": "新名称",
+          "title": "重命名文件"
+        },
+        "menu-item": "重命名"
+      },
+      "tip": "提示：双击以在解决方案区域聚焦图像，单击图片预览大图",
       "title": "预览"
     },
     "problem-list": {
@@ -224,6 +237,7 @@ interface Resources {
         "slogan": "学生的时间很宝贵",
         "source": "源代码"
       },
+      "loading": "加载中...",
       "mobile": {
         "empty": "先添加照片或 PDF 开始使用。",
         "hint-pdf": "启用 Gemini 源即可支持 PDF 上传。",
@@ -265,6 +279,10 @@ interface Resources {
         "pdf-blocked": {
           "description": "要处理 PDF，请启用 Gemini 源。",
           "title": "PDF 上传已禁用"
+        },
+        "unsupported-file": {
+          "description": "您的文件MIME 类型为 {{mimeType}}, 当前不被 SkidHomework 支持",
+          "title": "不支持的文件类型"
         },
         "working": {
           "description": "正在将 {{count}} 个文件发送到 AI 源...",
@@ -415,7 +433,7 @@ interface Resources {
           "label": "当前编辑的 AI 源"
         },
         "add": {
-          "address": "API 地址 ( 可选 )",
+          "address": "API 地址 （可选）",
           "cancel": "取消",
           "confirm": "添加",
           "key": "API 密钥",
@@ -576,6 +594,7 @@ interface Resources {
     },
     "upload-area": {
       "adb": {
+        "capture-timeout": "ADB 截图超时，请检查连接",
         "connect": "ADB 连接",
         "connecting": "连接中...",
         "menu-aria-label": "ADB 操作菜单",
@@ -594,7 +613,7 @@ interface Resources {
       "pdf-disabled": "仅在启用 Gemini 源时支持 PDF 上传。",
       "take-photo": "拍照",
       "toasts": {
-        "adb-failed": "ADB 处理发生异常： {{error}}",
+        "adb-failed": "ADB 处理发生异常：{{error}}",
         "webusb-not-supported": "该浏览器不支持 WebUSB。"
       },
       "upload": "上传文件",

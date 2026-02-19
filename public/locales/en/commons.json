@@ -239,7 +239,8 @@
       "connecting": "Connecting...",
       "screenshot-busy": "Capturing...",
       "screenshot-hint": "Capture a screenshot from a connected Android device via ADB (WebUSB)",
-      "menu-aria-label": "ADB Menu"
+      "menu-aria-label": "ADB Menu",
+      "capture-timeout": "ADB screenshot timed out. Please check the connection and try again."
     },
     "toasts": {
       "adb-failed": "Something went wrong with ADB: {{error}}",

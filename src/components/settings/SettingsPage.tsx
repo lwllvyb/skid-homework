@@ -81,7 +81,7 @@ export default function SettingsPage() {
   const { t, i18n } = useTranslation("commons", {
     keyPrefix: "settings-page",
   });
-  const isMobileLayout = useMediaQuery("(max-width: 640px)");
+  const isCompact = useMediaQuery("(max-width: 640px)");
 
   const searchParams = useSearchParams();
 
@@ -230,7 +230,7 @@ export default function SettingsPage() {
         label: translateSettings("shortcuts.actions.camera.label"),
         description: translateSettings("shortcuts.actions.camera.description"),
       },
-      !isMobileLayout && {
+      !isCompact && {
         action: "adbScreenshot" as ShortcutAction,
         label: translateSettings("shortcuts.actions.adb-screenshot.label"),
         description: translateSettings(
@@ -279,7 +279,7 @@ export default function SettingsPage() {
       label: string;
       description: string;
     }>;
-  }, [translateSettings, isMobileLayout]);
+  }, [translateSettings, isCompact]);
 
   const shortcutsTitle = translateSettings("shortcuts.title");
   const shortcutsDesc = translateSettings("shortcuts.desc");
