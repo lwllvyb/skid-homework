@@ -3,22 +3,27 @@
 import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
 import { cn } from "@/lib/utils";
 import {
+  type AiModelSummary,
+  type AiProvider,
   DEFAULT_GEMINI_BASE_URL,
   DEFAULT_OPENAI_BASE_URL,
   useAiStore,
-  type AiModelSummary,
-  type AiProvider,
 } from "@/store/ai-store";
 import {
-  useSettingsStore,
   type LanguagePreference,
   type ShortcutAction,
   type ThemePreference,
+  useSettingsStore,
 } from "@/store/settings-store";
 import { Check, ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -111,6 +116,10 @@ export default function SettingsPage() {
   } = useSettingsStore((s) => s);
 
   const { theme: activeTheme, setTheme } = useTheme();
+
+  const [recordingAction, setRecordingAction] = useState<ShortcutAction | null>(
+    null,
+  );
 
   const activeSource = useMemo(
     () => sources.find((source) => source.id === activeSourceId) ?? sources[0],
@@ -236,7 +245,9 @@ export default function SettingsPage() {
       {
         action: "textInput" as ShortcutAction,
         label: translateSettings("shortcuts.actions.text-input.label"),
-        description: translateSettings("shortcuts.actions.text-input.description"),
+        description: translateSettings(
+          "shortcuts.actions.text-input.description",
+        ),
       },
       !isCompact && {
         action: "adbScreenshot" as ShortcutAction,
@@ -413,6 +424,12 @@ export default function SettingsPage() {
                 <ShortcutRecorder
                   value={keybindings[item.action] ?? ""}
                   onChange={(combo) => setKeybinding(item.action, combo)}
+                  isRecording={recordingAction === item.action}
+                  onRecordingChange={(state) => {
+                    if (!state) { setRecordingAction(null) } else {
+                      setRecordingAction(item.action);
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -611,7 +628,9 @@ export default function SettingsPage() {
               <Checkbox
                 id="clear-dialog-on-submit"
                 checked={clearDialogOnSubmit}
-                onCheckedChange={(state) => setClearDialogOnSubmit(Boolean(state))}
+                onCheckedChange={(state) =>
+                  setClearDialogOnSubmit(Boolean(state))
+                }
               />
               <Label htmlFor="clear-dialog-on-submit">
                 {t("advanced.ui.clear-dialog-on-submit")}
