@@ -359,6 +359,7 @@ export const useAiStore = create<AiStore>()(
           // Remove model from all sources
           if (sources) {
             data.sources = sources.map((s) => {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const { model: _removed, ...rest } = s as AiSource & {
                 model?: string;
               };

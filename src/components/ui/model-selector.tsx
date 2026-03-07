@@ -57,7 +57,6 @@ export default function ModelSelector({
 
   const displayValue = useMemo(() => {
     if (isCustomSelected) {
-      // Show "自定义模型（模型名称）" when custom is selected with a value
       const label = customLabel ?? t("model.manual.title");
       return value ? `${label}（${value}）` : label;
     }

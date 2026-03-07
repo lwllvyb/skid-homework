@@ -5,7 +5,7 @@ import { useAiStore } from "@/store/ai-store";
 import { useAvailableModels } from "@/hooks/use-available-models";
 import ModelSelector, {
   CUSTOM_MODEL_VALUE,
-} from "@/components/ui/ModelSelector";
+} from "@/components/ui/model-selector.tsx";
 
 export default function ModelSelectorPopover() {
   const currentModel = useAiStore((s) => s.currentModel);
