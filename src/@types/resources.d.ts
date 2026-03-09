@@ -234,6 +234,7 @@ interface Resources {
       "discussions-btn": "讨论区";
       errors: {
         "missing-key": "{{provider}} 尚未配置 API 密钥。";
+        "no-client": "选定的来源没有可用的 AI 客户端。";
         "parsing-failed": "解析 AI 返回内容失败。";
         "processing-failed": {
           answer: "请检查控制台中的错误并重试。";

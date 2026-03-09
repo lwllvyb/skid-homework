@@ -164,6 +164,7 @@ export interface AiStore {
   sources: AiSource[];
   activeSourceId: string;
   fallbackModel: string | null;
+  fallbackSourceId: string | null;
   currentModel: string;
   isCustomModel: boolean;
   isCustomFallback: boolean;
@@ -177,7 +178,7 @@ export interface AiStore {
   removeSource: (id: string) => void;
   toggleSource: (id: string, enabled: boolean) => void;
   setActiveSource: (id: string) => void;
-  setFallbackModel: (model: string | null) => void;
+  setFallbackModel: (model: string | null, sourceId?: string | null) => void;
   setCurrentModel: (model: string) => void;
   setIsCustomModel: (isCustom: boolean) => void;
   setIsCustomFallback: (isCustom: boolean) => void;
@@ -200,6 +201,7 @@ export const useAiStore = create<AiStore>()(
       sources: createDefaultSources(),
       activeSourceId: "gemini-default",
       fallbackModel: null,
+      fallbackSourceId: null,
       currentModel: loadLegacyModel(),
       isCustomModel: false,
       isCustomFallback: false,
@@ -261,7 +263,8 @@ export const useAiStore = create<AiStore>()(
           return exists ? { activeSourceId: id } : state;
         }),
 
-      setFallbackModel: (model) => set({ fallbackModel: model }),
+      setFallbackModel: (model, sourceId) =>
+        set({ fallbackModel: model, fallbackSourceId: sourceId ?? null }),
 
       setCurrentModel: (model) => set({ currentModel: model }),
 
@@ -333,6 +336,7 @@ export const useAiStore = create<AiStore>()(
         sources: state.sources,
         activeSourceId: state.activeSourceId,
         fallbackModel: state.fallbackModel,
+        fallbackSourceId: state.fallbackSourceId,
         currentModel: state.currentModel,
         isCustomModel: state.isCustomModel,
         isCustomFallback: state.isCustomFallback,
@@ -341,7 +345,7 @@ export const useAiStore = create<AiStore>()(
         customFallbackName: state.customFallbackName,
         customFallbackSourceId: state.customFallbackSourceId,
       }),
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         const data =
           persistedState && typeof persistedState === "object"
@@ -368,9 +372,13 @@ export const useAiStore = create<AiStore>()(
           }
         }
         if (version < 4) {
-          // Migrate fallbackSourceId to fallbackModel (set to null)
+          // Clear old fallbackSourceId (it had different semantics)
           delete data.fallbackSourceId;
           data.fallbackModel = null;
+        }
+        if (version < 5) {
+          // Initialize fallbackSourceId for cross-provider fallback support
+          data.fallbackSourceId = null;
         }
         return data;
       },

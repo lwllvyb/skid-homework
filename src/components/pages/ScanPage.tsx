@@ -63,6 +63,11 @@ export default function ScanPage() {
   const activeSourceId = useAiStore((state) => state.activeSourceId);
   const currentModel = useAiStore((state) => state.currentModel);
   const fallbackModel = useAiStore((state) => state.fallbackModel);
+  const fallbackSourceId = useAiStore((state) => state.fallbackSourceId);
+  const isCustomFallback = useAiStore((state) => state.isCustomFallback);
+  const customFallbackSourceId = useAiStore(
+    (state) => state.customFallbackSourceId
+  );
   const getClientForSource = useAiStore((state) => state.getClientForSource);
   const allowPdfUploads = useAiStore((state) => state.allowPdfUpload());
 
@@ -72,6 +77,14 @@ export default function ScanPage() {
         source.id === activeSourceId && source.enabled && Boolean(source.apiKey)
     );
   }, [sources, activeSourceId]);
+
+  // Resolve the actual fallback source ID (custom or from model selection)
+  const resolvedFallbackSourceId = useMemo(() => {
+    if (isCustomFallback) {
+      return customFallbackSourceId || null;
+    }
+    return fallbackSourceId;
+  }, [isCustomFallback, customFallbackSourceId, fallbackSourceId]);
 
   // State to track if the AI is currently processing images.
   const setWorking = useProblemsStore((s) => s.setWorking);
@@ -206,16 +219,19 @@ export default function ScanPage() {
   };
 
   const retryAsyncOperation = async (
-    asyncFn: (model: string) => Promise<string>,
+    asyncFn: (model: string, sourceId?: string) => Promise<string>,
     sourceName: string,
     primaryModel: string,
+    primarySourceId: string,
     fallbackModelName: string | null,
+    fallbackSourceIdParam: string | null,
     maxRetries: number = 5,
     initialDelayMs: number = 5000
   ): Promise<string> => {
     // Helper function to run a single model's retry loop
     const runWithRetry = async (
       model: string,
+      sourceId: string | undefined,
       logPrefix: string
     ): Promise<{ result: string } | { error: Error }> => {
       let lastError: Error | undefined;
@@ -223,7 +239,7 @@ export default function ScanPage() {
 
       for (let attempt = 1; attempt <= Math.max(1, maxRetries); ++attempt) {
         try {
-          return { result: await asyncFn(model) };
+          return { result: await asyncFn(model, sourceId) };
         } catch (error) {
           lastError = error as Error;
 
@@ -254,7 +270,11 @@ export default function ScanPage() {
     };
 
     // Try with primary model first
-    const primaryResult = await runWithRetry(primaryModel, "Primary model");
+    const primaryResult = await runWithRetry(
+      primaryModel,
+      primarySourceId,
+      "Primary model"
+    );
     if ("result" in primaryResult) {
       return primaryResult.result;
     }
@@ -265,14 +285,22 @@ export default function ScanPage() {
     }
 
     // Primary model exhausted, try fallback model if available
+    // Use fallback source if specified (for cross-provider fallback), otherwise use primary source
     if (fallbackModelName) {
+      const effectiveFallbackSourceId =
+        fallbackSourceIdParam ?? primarySourceId;
+
       toast.info(t("toasts.fallback.title"), {
         description: t("toasts.fallback.description", {
           model: fallbackModelName,
         }),
       });
 
-      const fallbackResult = await runWithRetry(fallbackModelName, "Fallback");
+      const fallbackResult = await runWithRetry(
+        fallbackModelName,
+        effectiveFallbackSourceId,
+        "Fallback"
+      );
       if ("result" in fallbackResult) {
         return fallbackResult.result;
       }
@@ -401,8 +429,19 @@ ${traits}
         clearStreamedOutput(item.id);
 
         const resText = await retryAsyncOperation(
-          (model) =>
-            aiClient.sendMedia(
+          (model, sourceId) => {
+            // Get the appropriate client for the source (supports cross-provider fallback)
+            const client = sourceId ? getClientForSource(sourceId) : aiClient;
+            if (!client) {
+              throw new Error(t("errors.no-client"));
+            }
+
+            // Re-apply system prompts for the client
+            client.addSystemPrompt(solvePrompt);
+            client.addSystemPrompt(promptPrompt + traitsPrompt);
+            client.setAvailableTools(getEnabledToolCallingPrompts());
+
+            return client.sendMedia(
               {
                 data: base64,
                 mimeType: item.mimeType,
@@ -412,10 +451,13 @@ ${traits}
               model,
               (text) => appendStreamedOutput(item.id, text),
               { onlineSearch: onlineSearchEnabled }
-            ),
+            );
+          },
           activeSource.name,
           currentModel,
+          activeSource.id,
           fallbackModel,
+          resolvedFallbackSourceId,
           activeSource.maxRetries ?? 5
         );
 

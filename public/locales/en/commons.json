@@ -126,7 +126,8 @@
         "explanation": "{{error}}"
       },
       "missing-key": "Missing API key for {{provider}}.",
-      "parsing-failed": "Failed to parse the AI response."
+      "parsing-failed": "Failed to parse the AI response.",
+      "no-client": "No AI client available for the selected source."
     },
     "footer": {
       "license": "Licensed under GPL-3.0.",

@@ -1,12 +1,7 @@
 "use client";
 
 import { useQwenHintAutoToggle } from "@/hooks/useQwenHintAutoToggle";
-import {
-  type AiProvider,
-  DEFAULT_GEMINI_BASE_URL,
-  DEFAULT_OPENAI_BASE_URL,
-  useAiStore,
-} from "@/store/ai-store";
+import { type AiProvider, DEFAULT_GEMINI_BASE_URL, DEFAULT_OPENAI_BASE_URL, useAiStore, } from "@/store/ai-store";
 import {
   type LanguagePreference,
   type ShortcutAction,
@@ -23,24 +18,12 @@ import { useAvailableModels } from "@/hooks/use-available-models";
 import ShortcutRecorder from "./ShortcutRecorder";
 import { useTheme } from "../theme-provider";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "../ui/card";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Kbd } from "../ui/kbd";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "../ui/select";
 import { Slider } from "../ui/slider";
 import { Textarea } from "../ui/textarea";
 import AIAPICredentialsManager from "./AIAPICredentialsManager";
@@ -310,12 +293,12 @@ export default function SettingsPage() {
     setModelPopoverOpen(false);
   };
 
-  const handleFallbackChange = (model: string) => {
+  const handleFallbackChange = (model: string, sourceId?: string | null) => {
     if (model === CUSTOM_MODEL_VALUE) {
       setIsCustomFallback(true);
     } else {
       setIsCustomFallback(false);
-      setFallbackModel(model || null);
+      setFallbackModel(model || null, sourceId ?? null);
     }
     setFallbackPopoverOpen(false);
   };

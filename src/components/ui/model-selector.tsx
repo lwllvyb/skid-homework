@@ -22,10 +22,16 @@ import { type SourceModels } from "@/hooks/use-available-models";
 
 export const CUSTOM_MODEL_VALUE = "__custom__";
 
+export type ModelSelection = {
+  model: string;
+  sourceId: string | null;
+};
+
 export type ModelSelectorProps = {
   sourceModelsMap: SourceModels[];
   value: string | null;
-  onChangeAction: (model: string) => void;
+  /** Callback when model selection changes. sourceId is provided when selecting from a specific source. */
+  onChangeAction: (model: string, sourceId?: string | null) => void;
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
   placeholder?: string;
@@ -85,8 +91,8 @@ export default function ModelSelector({
     t,
   ]);
 
-  const handleSelect = (model: string) => {
-    onChangeAction(model);
+  const handleSelect = (model: string, sourceId: string | null) => {
+    onChangeAction(model, sourceId);
     onOpenChangeAction(false);
   };
 
@@ -114,7 +120,7 @@ export default function ModelSelector({
                   <CommandItem
                     key="__none__"
                     value="__none__"
-                    onSelect={() => handleSelect("")}
+                    onSelect={() => handleSelect("", null)}
                   >
                     <Check
                       className={cn(
@@ -131,7 +137,7 @@ export default function ModelSelector({
                   <CommandItem
                     key="__custom__"
                     value="__custom__"
-                    onSelect={() => handleSelect(CUSTOM_MODEL_VALUE)}
+                    onSelect={() => handleSelect(CUSTOM_MODEL_VALUE, null)}
                   >
                     <Check
                       className={cn(
@@ -157,7 +163,7 @@ export default function ModelSelector({
                     <CommandItem
                       key={`${source.id}-${model.name}`}
                       value={`${source.name} ${model.name} ${model.displayName}`}
-                      onSelect={() => handleSelect(model.name)}
+                      onSelect={() => handleSelect(model.name, source.id)}
                     >
                       <Check
                         className={cn(
